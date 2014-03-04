@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path(__dir__ + '/../lib')
+
+require 'rosetta'
+require 'optparse'
+require 'ostruct'
+require 'pp'
+
+options = OpenStruct.new
+
+ARGV << '-h' if ARGV.empty?
+ARGV.options do |o|
+  o.banner = <<-BANNER.gsub(/^ {4}/, '')
+
+    Usage: #{$0} [options] path/to/script.ros -- [args]
+
+  BANNER
+  o.on('-c', '--compile', 'compile to --target and save'){ |f| options.compile = f }
+  o.on('-t', '--target NAME', 'set the target language'){ |f| options.target = f.to_sym  }
+  o.on('-k', '--tokens', 'print out the tokens that the lexer/rewriter produce'){ |f| options.tokens = f}
+  o.on('-e', '--eval CODE', 'pass a string from the command line as input'){ |f| options.eval_text = f }
+  o.on('-v', '--version', 'display the version number'){ puts 'Rosetta version ' + Rosetta::VERSION; exit }
+  o.on('-h', '--help', 'display this help message'){ puts o; exit }
+  o.separator ''
+  o.parse!
+end
+
+abort 'You need to specify a valid target' unless options.target
+
+code =
+  if (f = ARGV.pop) && File.exist?(f)
+    File.read(f)
+  elsif options.eval_text
+    options.eval_text
+  else
+    puts "Press CTRL+D to quit"
+    STDIN.read
+  end
+
+parser = Rosetta::Parser.new
+ast = parser.parse(code)
+ast.target = options.target
+ast.writer = STDOUT
+ast.compile!
+
+if options.tokens
+  parser.lexer.pretty_print
+end
+
+abort ARGV.options unless ARGV.empty?
