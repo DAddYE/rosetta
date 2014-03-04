@@ -9,6 +9,7 @@ class Rosetta::Lexer
 
   attr_accessor :opts, :tokens, :code
 
+  # Extracted/Adapted from Jashkenas coffee lexer.
   def initialize(code, options = {})
     @opts          = options
     @indent        = 0   # The current indentation level.
