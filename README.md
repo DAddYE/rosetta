@@ -320,9 +320,7 @@ $ bin/ros -t go
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## Copyright (c) 2014 DAddYE (Davide D'Agostino)
-
-MIT License
+### MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
